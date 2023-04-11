@@ -1,12 +1,22 @@
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class GiftList {
 
     GiftNode head = null;
+    Lock lock;
     // int lastTag = -1;
     // int nextTag;
     // boolean started = false;
 
-    GiftList() {}
-    GiftList(GiftNode head) { this.head = head; }
+    // Current implementation: just locks
+    // cores choke in add operation
+
+    GiftList() { this.lock = new ReentrantLock(); }
+    GiftList(GiftNode head) { 
+        this.head = head; 
+        this.lock = new ReentrantLock();
+    }
 
     public boolean isEmpty() { return head == null; }
 
@@ -23,22 +33,27 @@ public class GiftList {
     }
 
     public void add(GiftNode node) {
-        if (node == null) return;
+        if (node == null || node.getLocation() != GiftNode.Location.bag) return;
         // started = true;
 
-        if (this.isEmpty()) {
-            this.head = node;
-            node.next = null;
-            node.prev = null;
-            // nextTag = node.getTag();
-            return;
-        }
+        lock.lock();
+        try {
+            if (this.isEmpty()) {
+                this.head = node;
+                node.next = null;
+                node.prev = null;
+                node.setLocation(GiftNode.Location.list);
+                // nextTag = node.getTag();
+                return;
+            }
 
-        GiftNode curr = head;
-        while (curr.next != null) { curr = curr.next; }
-        curr.next = node;
-        node.next = null;
-        node.prev = curr;
+            GiftNode curr = head;
+            while (curr.next != null) { curr = curr.next; }
+            curr.next = node;
+            node.next = null;
+            node.prev = curr;
+            node.setLocation(GiftNode.Location.list);
+        } finally { lock.unlock(); }
         // nextTag = node.getTag();
     }
 
@@ -59,12 +74,29 @@ public class GiftList {
         GiftNode curr = this.head;
         if (curr.next == null) {
             this.head = null;
+            curr.setLocation(GiftNode.Location.out);
             return curr;
         }
 
         this.head = this.head.next;
         this.head.prev = null;
 
+        curr.setLocation(GiftNode.Location.out);
         return curr;
+    }
+
+    // Verify that all nodes are in immediate ascending order
+    public boolean verifyContinuity() {
+        if (this.isEmpty()) return true;
+
+        GiftNode prev = this.head;
+        GiftNode curr = prev.next;
+        while (curr != null) {
+            if (prev.getTag() + 1 != curr.getTag()) return false;
+            prev = curr;
+            curr = curr.next;
+        }
+
+        return true;
     }
 }
