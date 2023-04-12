@@ -4,85 +4,104 @@ import java.util.concurrent.locks.ReentrantLock;
 public class GiftList {
 
     GiftNode head = null;
+    GiftNode tail = null;
+
     Lock lock;
-    // int lastTag = -1;
-    // int nextTag;
-    // boolean started = false;
+    Lock popLock;
 
     // Current implementation: just locks
     // cores choke in add operation
+    // Perhaps implement a circular queue to avoid traversing 
+    // entire linked list for every add() call
 
-    GiftList() { this.lock = new ReentrantLock(); }
-    GiftList(GiftNode head) { 
-        this.head = head; 
-        this.lock = new ReentrantLock();
+    GiftList() { 
+        this.lock = new ReentrantLock(); 
+        this.popLock = new ReentrantLock();
     }
 
-    public boolean isEmpty() { return head == null; }
+    GiftList(GiftNode head) { 
+        this.head = head;
+        this.lock = new ReentrantLock();
+        this.popLock = new ReentrantLock();
+    }
+
+    public boolean isEmpty() { return head == null && tail == null; }
 
     public void display() {
         if (head == null) return;
 
         GiftNode curr = head;
-        while (curr != null) {
+        do {
             System.out.printf("%d -> ", curr.getTag());
             curr = curr.next;
-        }
+        } while (curr != head);
 
         System.out.println("X");
     }
 
     public void add(GiftNode node) {
+        // if (node != null && node.getLocation() != GiftNode.Location.bag) System.out.println("lmao");
         if (node == null || node.getLocation() != GiftNode.Location.bag) return;
-        // started = true;
 
         lock.lock();
         try {
             if (this.isEmpty()) {
+                // lock.lock();
+                // try {
                 this.head = node;
-                node.next = null;
-                node.prev = null;
+                this.tail = node;
+
+                this.head.next = tail;
+                this.head.prev = tail;
+
+                this.tail.next = head;
+                this.tail.prev = head;
+
                 node.setLocation(GiftNode.Location.list);
-                // nextTag = node.getTag();
+                System.out.println("Just added: " + node.getTag());
                 return;
+                // } finally { lock.unlock(); }
             }
 
-            GiftNode curr = head;
-            while (curr.next != null) { curr = curr.next; }
-            curr.next = node;
-            node.next = null;
-            node.prev = curr;
+        // lock.lock();
+        // try {
+            System.out.println((head == null) + " " + (tail == null));
+            this.tail.next = node;
+            node.prev = this.tail;
+            this.tail = node;
+
+            this.tail.next = this.head;
+            this.head.prev = this.tail;
             node.setLocation(GiftNode.Location.list);
+            System.out.println("Just added: " + node.getTag());
         } finally { lock.unlock(); }
-        // nextTag = node.getTag();
     }
 
     public int getNextTag() {
-        // if (!started) return 0;
-        // return nextTag;
         if (this.isEmpty()) return 0;
-        GiftNode curr = head;
-
-        while (curr.next != null) curr = curr.next;
-        return curr.getTag() + 1; 
+        return tail.getTag() + 1;
     } 
 
     // removes the head from the list and returns it
     public GiftNode pop() {
         if (this.isEmpty()) return null;
 
-        GiftNode curr = this.head;
-        if (curr.next == null) {
-            this.head = null;
-            curr.setLocation(GiftNode.Location.out);
-            return curr;
-        }
+        lock.lock();
+        try {
+            GiftNode gift = head;
+            if (head == tail) {
+                gift.setLocation(GiftNode.Location.out);
+                head = null;
+                tail = null;
+                return gift;
+            }
 
-        this.head = this.head.next;
-        this.head.prev = null;
-
-        curr.setLocation(GiftNode.Location.out);
-        return curr;
+            head = head.next;
+            head.prev = tail;
+            tail.next = head;
+            gift.setLocation(GiftNode.Location.out);
+            return gift;
+        } finally { lock.unlock(); }
     }
 
     // Verify that all nodes are in immediate ascending order
@@ -91,7 +110,7 @@ public class GiftList {
 
         GiftNode prev = this.head;
         GiftNode curr = prev.next;
-        while (curr != null) {
+        while (curr != head) {
             if (prev.getTag() + 1 != curr.getTag()) return false;
             prev = curr;
             curr = curr.next;

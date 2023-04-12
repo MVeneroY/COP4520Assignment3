@@ -1,6 +1,9 @@
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+// TODO: Implement 8 threads
+// TODO: include write to memory
+
 class Runner {
 
     public static void main(String[] args) {

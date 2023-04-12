@@ -4,7 +4,7 @@ import java.util.concurrent.Executors;
 
 class Runner {
 
-    static final int n_gifts = 5000;
+    static final int n_gifts = 5;
     static final int n_servants = 4;
     static GiftNode[] gifts = new GiftNode[n_gifts];
     static ServantThread[] servants = new ServantThread[n_servants];
@@ -28,21 +28,28 @@ class Runner {
 
         int taskCount = 0;
         // Will continue working in a bit
-        while (!allInLocation(GiftNode.Location.list)) {
+        while (!allInLocation(GiftNode.Location.out)) {
             // servants carry out tasks
             executorService.execute(servants[taskCount % n_servants]);   
             servants[taskCount % n_servants].updateTask(servant_tasks[taskCount % n_servants]);
             servant_tasks[taskCount % n_servants] += 1;
             taskCount += 1;
+
+            // for debug 
+            // if (taskCount > 200) break;
         }
 
         list.display();
         System.out.println("Chain is in order: " + list.verifyContinuity());
+        for (int i = 0; i < n_gifts; ++i) {
+            if (gifts[i].getLocation() != GiftNode.Location.out) 
+                System.out.println(i + " is not out");
+        }
 
         executorService.shutdown();
         while (!executorService.isTerminated()) { 
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 System.out.println(e);
             }

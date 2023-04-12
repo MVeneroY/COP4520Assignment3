@@ -11,7 +11,7 @@ public class GiftNode {
 
     private Location location = Location.bag; 
     private int tag;
-    private String card = null;
+    private String card;
 
     GiftNode(int tag) { this.tag = tag; }
     public int getTag() { return this.tag; }
