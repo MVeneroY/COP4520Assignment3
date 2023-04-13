@@ -4,7 +4,7 @@ import java.util.concurrent.Executors;
 
 class Runner {
 
-    static final int n_gifts = 50_000;
+    static final int n_gifts = 500_000;
     static final int n_servants = 4;
     static GiftNode[] gifts = new GiftNode[n_gifts];
     static ServantThread[] servants = new ServantThread[n_servants];
