@@ -113,12 +113,12 @@ public class GiftList {
     }
 
     // public int clean() {
-    //     if (head == virtualhead || head.getLocation() != GiftNode.Location.out) return -1;
+    //     if (head == virtualhead || head == tail || head == null || head.getLocation() != GiftNode.Location.out) return -1;
 
     //     GiftNode temp = head;
     //     int tag = temp.getTag();
-    //     head = head.next;
 
+    //     head = head.next;
     //     temp = null;
     //     return tag;
     // }

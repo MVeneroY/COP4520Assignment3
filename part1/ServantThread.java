@@ -30,7 +30,6 @@ public class ServantThread implements Runnable {
         switch (task % 3) {
             case 0:
             // Add gift to list
-            // System.out.println("Adding gift to chain...");
             addGiftToChain(list);
             break;
             case 1:
@@ -67,6 +66,7 @@ public class ServantThread implements Runnable {
         int tag = list.getNextTag();
         if (tag >= n_gifts) return null;
         for (int i = 0; i < n_gifts; ++i) {
+            // if (gifts[i] == null) continue;
             if (gifts[i].getTag() == tag) return gifts[i];
         }
 

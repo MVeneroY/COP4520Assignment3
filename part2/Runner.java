@@ -18,7 +18,7 @@ class Runner {
 
     public static void main(String[] args) {
 
-        System.out.println("Part 2");
+        // System.out.println("Part 2");
         top5Cluster = new int[n_threads][5];
         min5Cluster = new int[n_threads][5];
         tempDiffInterval = new int[n_threads][interval];
@@ -33,6 +33,8 @@ class Runner {
 
             sensors[i] = new SensorThread(top5Cluster[i], min5Cluster[i] , tempDiffInterval[i], report);
         }
+
+        long start = System.currentTimeMillis();
 
         ExecutorService executorService = Executors.newFixedThreadPool(n_threads);
 
@@ -52,6 +54,11 @@ class Runner {
             report.flushBuffers();
         }
 
+        long end = System.currentTimeMillis();
+
+        System.out.println("\nTotal time: " + (end - start) + "ms");
+
+        System.err.println("Shutting down executor service...");
         executorService.shutdown();
         while (!executorService.isTerminated()) { 
             try {
