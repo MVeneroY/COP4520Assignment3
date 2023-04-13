@@ -5,6 +5,7 @@ public class GiftList {
 
     GiftNode head = null;
     GiftNode tail = null;
+    GiftNode virtualhead = null;
 
     Lock lock;
     Lock popLock;
@@ -40,40 +41,28 @@ public class GiftList {
     }
 
     public void add(GiftNode node) {
-        // if (node != null && node.getLocation() != GiftNode.Location.bag) System.out.println("lmao");
         if (node == null || node.getLocation() != GiftNode.Location.bag) return;
 
         lock.lock();
         try {
             if (this.isEmpty()) {
-                // lock.lock();
-                // try {
-                this.head = node;
-                this.tail = node;
+                head = node;
+                virtualhead = head;
+                tail = node;
 
-                this.head.next = tail;
-                this.head.prev = tail;
-
-                this.tail.next = head;
-                this.tail.prev = head;
+                head.next = tail;
+                tail.next = head;
 
                 node.setLocation(GiftNode.Location.list);
-                System.out.println("Just added: " + node.getTag());
+                // System.out.println("Just added: " + node.getTag());
                 return;
-                // } finally { lock.unlock(); }
             }
 
-        // lock.lock();
-        // try {
-            System.out.println((head == null) + " " + (tail == null));
-            this.tail.next = node;
-            node.prev = this.tail;
-            this.tail = node;
-
-            this.tail.next = this.head;
-            this.head.prev = this.tail;
+            tail.next = node;
+            tail = node;
+            tail.next = this.head;
             node.setLocation(GiftNode.Location.list);
-            System.out.println("Just added: " + node.getTag());
+            // System.out.println("Just added: " + node.getTag());
         } finally { lock.unlock(); }
     }
 
@@ -86,22 +75,35 @@ public class GiftList {
     public GiftNode pop() {
         if (this.isEmpty()) return null;
 
-        lock.lock();
+        popLock.lock();
         try {
-            GiftNode gift = head;
-            if (head == tail) {
-                gift.setLocation(GiftNode.Location.out);
-                head = null;
-                tail = null;
-                return gift;
-            }
+            GiftNode curr = virtualhead;
+            virtualhead.setLocation(GiftNode.Location.out);
+            if (virtualhead.next.getLocation() == GiftNode.Location.list)
+                virtualhead = virtualhead.next;
 
-            head = head.next;
-            head.prev = tail;
-            tail.next = head;
-            gift.setLocation(GiftNode.Location.out);
-            return gift;
-        } finally { lock.unlock(); }
+            return curr;
+            // GiftNode curr = head;
+            // while (curr != null && curr.getLocation() == GiftNode.Location.out) {
+            //     curr = curr.next;
+            // }
+
+            // curr.setLocation(GiftNode.Location.out);
+            // // System.out.println("hi");
+            // return curr;
+        } finally { popLock.unlock(); }
+    }
+
+    public boolean searchNode(int tag) {
+        if (this.isEmpty()) return false;
+
+        GiftNode curr = virtualhead;
+        do {
+            if (curr.getLocation() == GiftNode.Location.list && curr.getTag() == tag) return true;
+            curr = curr.next;
+        } while (curr != head);
+
+        return false;
     }
 
     // Verify that all nodes are in immediate ascending order

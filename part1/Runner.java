@@ -4,7 +4,7 @@ import java.util.concurrent.Executors;
 
 class Runner {
 
-    static final int n_gifts = 5;
+    static final int n_gifts = 500;
     static final int n_servants = 4;
     static GiftNode[] gifts = new GiftNode[n_gifts];
     static ServantThread[] servants = new ServantThread[n_servants];
@@ -22,34 +22,37 @@ class Runner {
         // Initialize servants
         ExecutorService executorService = Executors.newFixedThreadPool(n_servants);
         for (int i = 0; i < n_servants; ++i) {
-            servants[i] = new ServantThread(0, n_gifts, n_servants, gifts, list);
-            servant_tasks[i] = 0;
+            servants[i] = new ServantThread(i, n_gifts, n_servants, gifts, list);
+            servant_tasks[i] = i;
         }
 
+        long start = System.currentTimeMillis();
+
         int taskCount = 0;
-        // Will continue working in a bit
         while (!allInLocation(GiftNode.Location.out)) {
             // servants carry out tasks
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             executorService.execute(servants[taskCount % n_servants]);   
             servants[taskCount % n_servants].updateTask(servant_tasks[taskCount % n_servants]);
             servant_tasks[taskCount % n_servants] += 1;
             taskCount += 1;
-
-            // for debug 
-            // if (taskCount > 200) break;
         }
 
-        list.display();
         System.out.println("Chain is in order: " + list.verifyContinuity());
-        for (int i = 0; i < n_gifts; ++i) {
-            if (gifts[i].getLocation() != GiftNode.Location.out) 
-                System.out.println(i + " is not out");
-        }
+        long end = System.currentTimeMillis();
+
+        System.out.println("Total time: " + (end - start) + "ms");
 
         executorService.shutdown();
         while (!executorService.isTerminated()) { 
             try {
                 Thread.sleep(10);
+                // System.out.println("shut down check...");
             } catch (InterruptedException e) {
                 System.out.println(e);
             }

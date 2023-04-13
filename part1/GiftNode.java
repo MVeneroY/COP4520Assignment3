@@ -7,26 +7,27 @@ public class GiftNode {
     }
     
     GiftNode next = null;
-    GiftNode prev = null;
 
     private Location location = Location.bag; 
     private int tag;
     private String card;
 
     GiftNode(int tag) { this.tag = tag; }
+
     public int getTag() { return this.tag; }
     public Location getLocation() { return this.location; }
+    
     public void setLocation(Location location) { this.location = location; }
     public void setCard(String card) { this.card = card; }
 
-    public void link(GiftNode prev) {
-        prev.next = this;
-    }
+    // public void link(GiftNode prev) {
+    //     prev.next = this;
+    // }
 
-    public GiftNode unlink() {
-        GiftNode curr = this;
-        this.prev.next = this.next;
+    // public GiftNode unlink() {
+    //     GiftNode curr = this;
+    //     // this.prev.next = this.next;
 
-        return curr;
-    }
+    //     return curr;
+    // }
 }

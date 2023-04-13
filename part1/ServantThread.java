@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class ServantThread implements Runnable {
 
     private int task;
@@ -6,6 +8,7 @@ public class ServantThread implements Runnable {
     GiftNode[] gifts;
     GiftList list;
 
+    Random rand;
     int cardsWritten = 0;
 
     ServantThread(int task, int n_gifts, int n_servants, GiftNode[] gifts, GiftList list) {
@@ -14,6 +17,8 @@ public class ServantThread implements Runnable {
         this.n_servants = n_servants;
         this.gifts = gifts;
         this.list = list;
+
+        rand = new Random();
     }
 
     // TODO: implement locks
@@ -27,11 +32,16 @@ public class ServantThread implements Runnable {
             break;
             case 1:
             // Write thank you note to gift
+            // System.out.println("hi");
             GiftNode gift = list.pop();
             writeNote(gift);
             break;
             case 2:
             // Search for gift in list
+            int tag = rand.nextInt(n_gifts);
+            boolean result = list.searchNode(tag);
+            // if (result) System.out.println("gift #" + tag + "present in list");
+            // else System.out.println("present #" + tag + " not present in list");
             break;
             default:
         }
@@ -44,7 +54,7 @@ public class ServantThread implements Runnable {
         GiftNode gift = findNextGift();
         if (gift == null) return;
 
-        System.out.println("Adding gift with id:" + gift.getTag());
+        // System.out.println("Adding gift with id:" + gift.getTag());
         list.add(gift);
     }
 
@@ -62,13 +72,11 @@ public class ServantThread implements Runnable {
     void writeNote(GiftNode gift) {
         if (gift == null) return;
 
-        System.out.println("Writing thank you note to gift with id: " + gift.getTag());
+        // System.out.println("Writing thank you note to gift with id: " + gift.getTag());
         String note = "Thank you!";
         gift.setCard(note);
         gift.setLocation(GiftNode.Location.out);
 
         cardsWritten += 1;
     }
-
-    // Search for gift
 }
