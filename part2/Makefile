@@ -1,4 +1,4 @@
-clear: *.class 
+clean: *.class 
 	rm *.class 
 
 run: Runner.java 

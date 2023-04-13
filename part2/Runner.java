@@ -49,6 +49,7 @@ class Runner {
             }
 
             report.displayReport();
+            report.flushBuffers();
         }
 
         executorService.shutdown();

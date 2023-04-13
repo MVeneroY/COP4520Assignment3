@@ -46,7 +46,7 @@ public class Report {
     }
 
     public void displayReport() {
-        System.out.println("Hourly report:");
+        System.out.println("\nHourly report:");
         System.out.println("top 5 temperatures-");
         for (int i = 0; i < 5; ++i) System.out.printf("%6dF", top5[i]);
         System.out.println();
@@ -58,6 +58,14 @@ public class Report {
         System.out.println("10 minute interval with the greatest temperature difference-");
         for (int i = 0; i < interval; ++i) System.out.printf("%6dF", tempDiffInterval[i]);
         System.out.println();
+    }
+
+    public void flushBuffers() {
+        for (int i = 0; i < 5; ++i) {
+            top5[i] = min;
+            min5[i] = max;
+        }
+        for (int i = 0; i < interval; ++i) tempDiffInterval[i] = 0;
     }
 
     int getIntervalDiff(int[] tempDiffInterval) {

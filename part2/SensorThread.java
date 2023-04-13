@@ -1,6 +1,6 @@
 import java.util.Random;
-import java.util.Arrays;
 import java.lang.Math;
+import java.util.Arrays;   
 
 public class SensorThread implements Runnable {
     
