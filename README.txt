@@ -18,9 +18,9 @@ Proof of Correcness:
 Proof of Efficiency:
 Experimental Evaluation:
 
-50 gifts            Time
-500 gifts           Time
-5,000 gifts         Time
+50 gifts            9ms
+500 gifts           42ms
+5,000 gifts         637ms
 50,000 gifts        Time
 500,000 gifts       Time
 

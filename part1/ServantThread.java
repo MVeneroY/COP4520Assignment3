@@ -21,9 +21,13 @@ public class ServantThread implements Runnable {
         rand = new Random();
     }
 
-    // TODO: implement locks
     @Override
     public void run() {
+        // No need to add gifts if all gifts are in the chain
+        if (list.tail != null) {
+            if (task % 3 == 0 && list.tail.getLocation() == GiftNode.Location.list) task = 1;
+        }
+
         switch (task % 3) {
             case 0:
             // Add gift to list
@@ -32,7 +36,6 @@ public class ServantThread implements Runnable {
             break;
             case 1:
             // Write thank you note to gift
-            // System.out.println("hi");
             GiftNode gift = list.pop();
             writeNote(gift);
             break;
@@ -73,7 +76,7 @@ public class ServantThread implements Runnable {
         if (gift == null) return;
 
         // System.out.println("Writing thank you note to gift with id: " + gift.getTag());
-        String note = "Thank you!";
+        char note = 't';
         gift.setCard(note);
         gift.setLocation(GiftNode.Location.out);
 

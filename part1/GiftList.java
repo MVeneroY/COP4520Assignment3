@@ -10,11 +10,6 @@ public class GiftList {
     Lock lock;
     Lock popLock;
 
-    // Current implementation: just locks
-    // cores choke in add operation
-    // Perhaps implement a circular queue to avoid traversing 
-    // entire linked list for every add() call
-
     GiftList() { 
         this.lock = new ReentrantLock(); 
         this.popLock = new ReentrantLock();
@@ -41,10 +36,12 @@ public class GiftList {
     }
 
     public void add(GiftNode node) {
-        if (node == null || node.getLocation() != GiftNode.Location.bag) return;
-
         lock.lock();
         try {
+            if (node == null || node.getLocation() != GiftNode.Location.bag) return;
+
+            // if (node.getTag() % 1000 == 0) System.out.println(node.getTag()); 
+
             if (this.isEmpty()) {
                 head = node;
                 virtualhead = head;
@@ -60,7 +57,7 @@ public class GiftList {
 
             tail.next = node;
             tail = node;
-            tail.next = this.head;
+            tail.next = head;
             node.setLocation(GiftNode.Location.list);
             // System.out.println("Just added: " + node.getTag());
         } finally { lock.unlock(); }
@@ -73,15 +70,15 @@ public class GiftList {
 
     // removes the head from the list and returns it
     public GiftNode pop() {
-        if (this.isEmpty()) return null;
-
-        popLock.lock();
+        lock.lock();
         try {
+            if (this.isEmpty()) return null;
             GiftNode curr = virtualhead;
             virtualhead.setLocation(GiftNode.Location.out);
             if (virtualhead.next.getLocation() == GiftNode.Location.list)
                 virtualhead = virtualhead.next;
 
+            // System.out.println("just popped: " + curr.getTag());
             return curr;
             // GiftNode curr = head;
             // while (curr != null && curr.getLocation() == GiftNode.Location.out) {
@@ -89,9 +86,8 @@ public class GiftList {
             // }
 
             // curr.setLocation(GiftNode.Location.out);
-            // // System.out.println("hi");
             // return curr;
-        } finally { popLock.unlock(); }
+        } finally { lock.unlock(); }
     }
 
     public boolean searchNode(int tag) {
@@ -99,7 +95,7 @@ public class GiftList {
 
         GiftNode curr = virtualhead;
         do {
-            if (curr.getLocation() == GiftNode.Location.list && curr.getTag() == tag) return true;
+            if (curr == null || curr.getLocation() == GiftNode.Location.list && curr.getTag() == tag) return true;
             curr = curr.next;
         } while (curr != head);
 

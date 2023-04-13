@@ -10,7 +10,7 @@ public class GiftNode {
 
     private Location location = Location.bag; 
     private int tag;
-    private String card;
+    private char card;
 
     GiftNode(int tag) { this.tag = tag; }
 
@@ -18,16 +18,5 @@ public class GiftNode {
     public Location getLocation() { return this.location; }
     
     public void setLocation(Location location) { this.location = location; }
-    public void setCard(String card) { this.card = card; }
-
-    // public void link(GiftNode prev) {
-    //     prev.next = this;
-    // }
-
-    // public GiftNode unlink() {
-    //     GiftNode curr = this;
-    //     // this.prev.next = this.next;
-
-    //     return curr;
-    // }
+    public void setCard(char card) { this.card = card; }
 }

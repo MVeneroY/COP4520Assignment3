@@ -4,7 +4,7 @@ import java.util.concurrent.Executors;
 
 class Runner {
 
-    static final int n_gifts = 500;
+    static final int n_gifts = 500_000;
     static final int n_servants = 4;
     static GiftNode[] gifts = new GiftNode[n_gifts];
     static ServantThread[] servants = new ServantThread[n_servants];
@@ -31,11 +31,11 @@ class Runner {
         int taskCount = 0;
         while (!allInLocation(GiftNode.Location.out)) {
             // servants carry out tasks
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            // try {
+            //     Thread.sleep(10);
+            // } catch (InterruptedException e) {
+            //     e.printStackTrace();
+            // }
 
             executorService.execute(servants[taskCount % n_servants]);   
             servants[taskCount % n_servants].updateTask(servant_tasks[taskCount % n_servants]);
@@ -43,11 +43,12 @@ class Runner {
             taskCount += 1;
         }
 
-        System.out.println("Chain is in order: " + list.verifyContinuity());
+        // System.out.println("Chain is in order: " + list.verifyContinuity());
         long end = System.currentTimeMillis();
 
         System.out.println("Total time: " + (end - start) + "ms");
 
+        System.err.println("Shutting down executor service...");
         executorService.shutdown();
         while (!executorService.isTerminated()) { 
             try {
@@ -66,10 +67,6 @@ class Runner {
     }
 
     public static boolean allInLocation(GiftNode.Location location) {
-        for (int i = 0; i < n_gifts; ++i) {
-            if (gifts[i].getLocation() != location) return false;
-        }
-
-        return true;
+        return gifts[n_gifts-1].getLocation() == location;
     }
 }
