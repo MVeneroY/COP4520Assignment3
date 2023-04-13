@@ -79,17 +79,12 @@ public class GiftList {
                 virtualhead = virtualhead.next;
 
             // System.out.println("just popped: " + curr.getTag());
-            return curr;
-            // GiftNode curr = head;
-            // while (curr != null && curr.getLocation() == GiftNode.Location.out) {
-            //     curr = curr.next;
-            // }
 
-            // curr.setLocation(GiftNode.Location.out);
-            // return curr;
+            return curr;
         } finally { lock.unlock(); }
     }
 
+    // Return true if node is in the list
     public boolean searchNode(int tag) {
         if (this.isEmpty()) return false;
 
@@ -116,4 +111,15 @@ public class GiftList {
 
         return true;
     }
+
+    // public int clean() {
+    //     if (head == virtualhead || head.getLocation() != GiftNode.Location.out) return -1;
+
+    //     GiftNode temp = head;
+    //     int tag = temp.getTag();
+    //     head = head.next;
+
+    //     temp = null;
+    //     return tag;
+    // }
 }

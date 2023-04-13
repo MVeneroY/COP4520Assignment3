@@ -58,6 +58,9 @@ class Runner {
                 System.out.println(e);
             }
         }
+
+        list = null;
+        gifts = null;
     }
 
     public static void swap(int index1, int index2) {

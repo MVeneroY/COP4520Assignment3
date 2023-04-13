@@ -9,7 +9,6 @@ public class ServantThread implements Runnable {
     GiftList list;
 
     Random rand;
-    int cardsWritten = 0;
 
     ServantThread(int task, int n_gifts, int n_servants, GiftNode[] gifts, GiftList list) {
         this.task = task;
@@ -48,6 +47,9 @@ public class ServantThread implements Runnable {
             break;
             default:
         }
+
+        // int tag = list.clean();
+        // if (tag != -1) gifts[tag] = null;
     }
     
     public void updateTask(int task) { this.task = task; }
@@ -76,10 +78,7 @@ public class ServantThread implements Runnable {
         if (gift == null) return;
 
         // System.out.println("Writing thank you note to gift with id: " + gift.getTag());
-        char note = 't';
-        gift.setCard(note);
+        gift.setCard('t');
         gift.setLocation(GiftNode.Location.out);
-
-        cardsWritten += 1;
     }
 }
