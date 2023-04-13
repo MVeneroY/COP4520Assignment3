@@ -1,19 +1,55 @@
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// TODO: Implement 8 threads
-// TODO: include write to memory
-
 class Runner {
+
+    final static int n_threads = 8;
+    final static int interval = 10;
+    final static int n_readings = 5;
+    final static int max = 70;
+    final static int min = -100;
+
+    static int[][] top5Cluster;
+    static int[][] min5Cluster;
+    static int[][] tempDiffInterval;
+
+    static SensorThread[] sensors;
+    static Report report;
 
     public static void main(String[] args) {
 
         System.out.println("Part 2");
+        top5Cluster = new int[n_threads][5];
+        min5Cluster = new int[n_threads][5];
+        tempDiffInterval = new int[n_threads][interval];
 
-        SensorThread sensor = new SensorThread();
-        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        sensors = new SensorThread[n_threads];
+        report = new Report(interval, max, min);
 
-        executorService.execute(sensor);
+        for (int i = 0; i < n_threads; ++i) {
+            top5Cluster[i] = new int[5];
+            min5Cluster[i] = new int[5];
+            tempDiffInterval[i] = new int[interval];
+
+            sensors[i] = new SensorThread(top5Cluster[i], min5Cluster[i] , tempDiffInterval[i], report);
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(n_threads);
+
+        for (int i = 0; i < n_readings; ++i) {
+
+            for (int j = 0; j < n_threads; ++j) {
+                executorService.execute(sensors[i]);
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            report.displayReport();
+        }
 
         executorService.shutdown();
         while (!executorService.isTerminated()) { 

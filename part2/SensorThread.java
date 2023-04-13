@@ -13,11 +13,17 @@ public class SensorThread implements Runnable {
     int[] readings;
     int[] top5;
     int[] min5;
-    int[] temperatureDifferenceInterval;
+    int[] tempDiffInterval;
+    Report report;
 
-    SensorThread() {
+    SensorThread(int[] top5, int[] min5, int[] tempDiffInterval, Report report) {
         rand = new Random();
-        readings = new int[minutes];
+        this.readings = new int[minutes];
+
+        this.top5 = top5;
+        this.min5 = min5;
+        this.tempDiffInterval = tempDiffInterval;
+        this.report  = report;
     }
 
     @Override
@@ -25,18 +31,14 @@ public class SensorThread implements Runnable {
         for (int i = 0; i < minutes; ++i) {
             readings[i] = getTemperatureReading();
         }
-        temperatureDifferenceInterval = getLargestTempDifferenceInterval();
+        getLargestTempDifferenceInterval();
 
         Arrays.sort(readings);
-        top5 = getHighestTemperatures();
-        min5 = getLowestTemperatures();
+        getHighestTemperatures();
+        getLowestTemperatures();
 
-        System.out.println("Diff interval");
-        for (int i = 0; i < interval; ++i) System.out.println(temperatureDifferenceInterval[i]);
-        System.out.println("top 5");
-        for (int i = 0; i < 5; ++i) System.out.println(top5[i]);
-        System.out.println("min 5");
-        for (int i = 0; i < 5; ++i) System.out.println(min5[i]);
+        // displayData();
+        report.buildReport(top5, min5, tempDiffInterval);
     }
 
     int getTemperatureReading() {
@@ -45,24 +47,17 @@ public class SensorThread implements Runnable {
     }
 
     // Precondition: readings array is sorted
-    int[] getHighestTemperatures() {
-        int[] top5 = new int[5];
+    void getHighestTemperatures() {
         for (int i = 0; i < 5; ++i) top5[i] = readings[minutes-5+i];
-
-        return top5;
     }
 
     // Precondition: readings array is sorted
-    int[] getLowestTemperatures() {
-        int[] min5 = new int[5];    
+    void getLowestTemperatures() {
         for (int i = 0; i < 5; ++i) min5[i] = readings[i];
-
-        return min5;
     }
 
     // Precondition: readings are in the order they were recorded in
-    int[] getLargestTempDifferenceInterval() {
-        int[] temperatureDifferenceInterval = new int[interval];
+    void getLargestTempDifferenceInterval() {
         int start = 0;
         int maxDiff = 0;
         int maxDiffIndex = 0;
@@ -77,9 +72,16 @@ public class SensorThread implements Runnable {
         }
 
         for (int i = 0; i < interval; ++i) {
-            temperatureDifferenceInterval[i] = readings[maxDiffIndex+i];
+            tempDiffInterval[i] = readings[maxDiffIndex+i];
         }
+    }
 
-        return temperatureDifferenceInterval;
+    void displayData() {
+        System.out.println("Diff interval");
+        for (int i = 0; i < interval; ++i) System.out.println(tempDiffInterval[i]);
+        System.out.println("top 5");
+        for (int i = 0; i < 5; ++i) System.out.println(top5[i]);
+        System.out.println("min 5");
+        for (int i = 0; i < 5; ++i) System.out.println(min5[i]);
     }
 }
